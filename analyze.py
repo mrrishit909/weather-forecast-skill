@@ -61,7 +61,7 @@ def main():
     for sid, name in STATIONS.items():
         obs, dropped = load(sid); X = design(DAYS, K, True); X0 = design(DAYS, K, False); XR = design(DAYS, KR, False)
         st_rows.append({"station": name, "id": sid, "ghcn_name": meta[sid][3], "state": meta[sid][2], "latitude": float(meta[sid][0]), "longitude": float(meta[sid][1]), "days": N, "tmax_observed": int(np.isfinite(obs["TMAX"]).sum()), "tmin_observed": int(np.isfinite(obs["TMIN"]).sum()), "prcp_observed": int(np.isfinite(obs["PRCP"]).sum()),
-                        "tmax_flagged": int(dropped.get("TMAX", 0)), "tmin_flagged": int(dropped.get("TMIN", 0)), "prcp_flagged": int(dropped.get("PRCP", 0)), "wet_day_share": float(np.nanmean(obs["PRCP"] >= 1.0)), "mean_tmax": float(np.nanmean(obs["TMAX"])), "mean_tmin": float(np.nanmean(obs["TMIN"]))})
+                        "tmax_flagged": int(dropped.get("TMAX", 0)), "tmin_flagged": int(dropped.get("TMIN", 0)), "prcp_flagged": int(dropped.get("PRCP", 0)), "wet_day_share": float(np.mean(obs["PRCP"][np.isfinite(obs["PRCP"])] >= 1.0)), "mean_tmax": float(np.nanmean(obs["TMAX"])), "mean_tmin": float(np.nanmean(obs["TMIN"]))})
         for el in ("TMAX", "TMIN"):
             y = obs[el]; acc = {h: np.zeros(8) for h in H}; sea = {(h, s): np.zeros(3) for h in (1, 3, 7) for s in ("winter", "spring", "summer", "autumn")}; h1 = {"roll": [], "obs": [], "stale_t": [], "stale_s": []}
             bst = fit(X[(YEAR >= 1991) & (YEAR <= 2010)], y[(YEAR >= 1991) & (YEAR <= 2010)]); bss = fit(X0[(YEAR >= 1991) & (YEAR <= 2010)], y[(YEAR >= 1991) & (YEAR <= 2010)]); cst, css = X @ bst, X0 @ bss
